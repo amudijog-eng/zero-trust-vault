@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  vault:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - VAULT_MASTER_KEY=SecretMasterKey123456789ZeroTrust
+      - VAULT_ENV=production
+    restart: unless-stopped
