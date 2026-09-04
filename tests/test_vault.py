@@ -2,6 +2,7 @@ import unittest
 from vault.crypto import VaultCrypto
 from vault.audit_ledger import AuditLedger
 from vault.engine import SecretVaultEngine
+from vault.envelope import EnvelopeEncryptionEngine
 
 class TestZeroTrustVault(unittest.TestCase):
     def test_crypto_roundtrip(self):
@@ -11,6 +12,14 @@ class TestZeroTrustVault(unittest.TestCase):
         self.assertNotEqual(secret, encrypted)
         decrypted = crypto.decrypt(encrypted)
         self.assertEqual(secret, decrypted)
+
+    def test_envelope_encryption(self):
+        env = EnvelopeEncryptionEngine("EnterpriseRootKEK_Key99!")
+        envelope = env.encrypt_payload("ProductionDatabasePassword_DB445")
+        self.assertIn("encrypted_dek", envelope)
+        self.assertIn("ciphertext", envelope)
+        recovered = env.decrypt_payload(envelope)
+        self.assertEqual(recovered, "ProductionDatabasePassword_DB445")
 
     def test_audit_ledger_integrity(self):
         ledger = AuditLedger()
